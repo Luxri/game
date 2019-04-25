@@ -10,8 +10,8 @@ public class game extends Canvas {
 
 
         int x, y;
-        int x1 = 600;
-        int y1 = 600;
+        int x1 = 100;
+        int y1 = 100;
         double angle = 0;
         Image image;
         Graphics dbg;
@@ -23,48 +23,9 @@ public class game extends Canvas {
             setSize(width, height);
             JFrame frame = new JFrame("Game");
             frame.add(this);
-            frame.addKeyListener(new KeyListener() {
-                @Override
-                public void keyTyped(KeyEvent e) {
+            this.addKeyListener(new KL());
+//            frame.addKeyListener(new KL());
 
-                }
-
-                @Override
-                public void keyPressed(KeyEvent e) {
-
-                }
-
-                @Override
-                public void keyReleased(KeyEvent e) {
-
-                }
-            });
-            frame.addMouseListener(new MouseListener() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mousePressed(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-
-                }
-            });
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.pack();
             frame.setVisible(true);
@@ -95,9 +56,43 @@ public class game extends Canvas {
         }
 
     private void world(Graphics dbg) {
-        dbg.fillRect(0, 0, 500, 200);
-        dbg.fillRect(600, 600, 300, 300);
         dbg.setColor(Color.red);
+        dbg.fillRect(0, 0, 500, 200);
+        dbg.setColor(Color.green);
+        dbg.fillRect(0, 300, 500, 200);
+        dbg.setColor(Color.blue);
+        dbg.fillRect(x1, y1,200,100);
+
+    }
+
+    private class KL implements KeyListener {
+        @Override
+        public void keyTyped(KeyEvent keyEvent) {
+
+        }
+
+        /**
+         * Använd a-s-w-d för att styra cirkelns koordinater
+         * @param keyEvent
+         */
+        @Override
+        public void keyPressed(KeyEvent keyEvent) {
+            System.out.println("Key pressed: " + keyEvent.getKeyChar());
+            if (keyEvent.getKeyChar()=='a') {
+                x1-=5;
+            } else if (keyEvent.getKeyChar()=='d') {
+                x1+=5;
+            } else if (keyEvent.getKeyChar()=='w') {
+                y1-=5;
+            } else if (keyEvent.getKeyChar()=='s') {
+                y1+=5;
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent keyEvent) {
+
+        }
     }
 
     public static void main(String[] args) {
