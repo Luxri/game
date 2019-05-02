@@ -5,6 +5,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.Graphics;
+import java.awt.image.BufferStrategy;
 
 public class game extends Canvas {
 
@@ -17,6 +18,9 @@ public class game extends Canvas {
         Graphics dbg;
         int width = 500;
         int height = 500;
+        private boolean running = false;
+        BufferStrategy bs;
+        private Thread thread;
 
         public game()
         {
@@ -31,28 +35,50 @@ public class game extends Canvas {
             frame.setVisible(true);
         }
 
-        public void paint (Graphics g) {
-            if (image == null) { //Create the buffer
-                image = createImage(width, height);
-                if (image == null) {
-                    System.out.println("image is still null!");
-                    return;
-                } else {
-                    dbg = image.getGraphics();
-                }
+    public synchronized void start() {
+        running = true;
+        thread = new Thread(this);
+        thread.start();
+    }
+
+    public synchronized void stop() {
+        running = false;
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void run() {
+        double ns = 1000000000.0 / 30.0;
+        double delta = 0;
+        long lastTime = System.nanoTime();
+
+        while (running) {
+            long now = System.nanoTime();
+            delta += (now - lastTime) / ns;
+            lastTime = now;
+
+            while(delta >= 1) {
+                // Uppdatera koordinaterna
+                update();
+                // Rita ut bilden med updaterad data
+                render();
+                delta--;
             }
+        }
+        stop();
+    }
 
-
-            world(dbg);
-            g.drawImage(image, 0, 0, null);
-            // Borde inte behövas...
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            repaint();
-
+    /**
+     * Eftersom vi inte längre behöver paint och repaint döper jag om metoden till render
+     */
+    public void render() {
+        bs = getBufferStrategy();
+        if (bs == null) {
+            createBufferStrategy(3);
+            return;
         }
 
     private void world(Graphics dbg) {
@@ -95,8 +121,13 @@ public class game extends Canvas {
         }
     }
 
-    public static void main(String[] args) {
-    game g = new game();
+    public static void main(String[] args){
+        game g = new game();
+            java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                g.setVisible(true);
+            }
+        });
         }
 }
 
